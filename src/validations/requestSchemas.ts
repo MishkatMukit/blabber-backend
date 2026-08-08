@@ -6,11 +6,27 @@ export const registerSchema = z.object({
   name: optionalString.min(2, "Name must be at least 2 characters"),
   email: z.email("Please provide a valid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  phone: optionalString.optional(),
   profilePhoto: optionalString.optional(),
 });
 
 export const loginSchema = z.object({
   email: z.email("Please provide a valid email"),
   password: z.string().min(1, "Password is required"),
+});
+
+export const refreshTokenSchema = z.object({
+  refreshToken: z.string().min(1, "Refresh token is required"),
+});
+
+export const logoutSchema = z.object({
+  refreshToken: z.string().min(1, "Refresh token is required"),
+});
+
+// Blab schemas
+export const createBlabSchema = z.object({
+  content: z.string().trim().min(1, "Content cannot be empty").max(500, "Content cannot exceed 500 characters"),
+});
+
+export const updateBlabSchema = z.object({
+  content: z.string().trim().min(1, "Content cannot be empty").max(500, "Content cannot exceed 500 characters"),
 });

@@ -1,6 +1,7 @@
 model User {
-  id        String   @id // Firebase UID
+  id        String   @id @default(uuid())
   email     String   @unique
+  password  String
   createdAt DateTime @default(now())
   role      Role     @default(USER)
   profile Profile?

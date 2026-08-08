@@ -4,7 +4,8 @@ import cookieParser from "cookie-parser";
 import config from "./config";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import { routeHandler } from "./middleware/routerHandler";
-import { exampleRoutes } from "./modules/example/example.route";
+import { blabRoutes } from "./modules/blab/blab.route";
+import { authRoutes } from "./modules/auth/auth.routes";
 
 const app: Application = express();
 
@@ -26,7 +27,8 @@ app.get("/", async (req: Request, res: Response) => {
   });
 });
 
-app.use("/api/example", exampleRoutes);
+app.use("/api/blabs", blabRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use(globalErrorHandler);
 app.use(routeHandler);

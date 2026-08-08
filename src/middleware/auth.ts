@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { ActiveStatus, type Role } from "../../generated/prisma/enums";
+import { type Role } from "../../generated/prisma/enums";
 import catchAsync from "../utils/catchAsync";
 import config from "../config";
 import { jwtUtils } from "../utils/jwt";
@@ -32,25 +32,47 @@ const auth = (...requiredRoles: Role[]) => {
 
     const user = await prisma.user.findUnique({
       where: { id },
+      include: {
+        profile: {
+          select: { id: true },
+        },
+      },
     });
 
     if (!user) {
       throw new Error("User not found. Please login again.");
     }
 
-    if (user.status === ActiveStatus.SUSPENDED) {
-      throw new Error("Your account has been suspended. Please contact support.");
-    }
-
     req.user = {
       id: user.id,
-      name: user.name,
       email: user.email,
       role: user.role,
+      ...(user.profile ? { profileId: user.profile.id } : {}),
     };
 
     next();
   });
 };
 
+const setAuthCookies = (res: Response, accessToken: string, refreshToken: string) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: isProduction,
+  });
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: isProduction,
+  });
+};
+
+const clearAuthCookies = (res: Response) => {
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+};
+
 export default auth;
+export { setAuthCookies, clearAuthCookies };
