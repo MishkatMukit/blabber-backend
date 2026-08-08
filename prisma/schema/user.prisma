@@ -1,12 +1,9 @@
 model User {
-  id        String       @id @default(uuid())
-  name      String
-  email     String       @unique
-  password  String
-  role      Role         @default(CUSTOMER)
-  status    ActiveStatus @default(ACTIVE)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id        String   @id // Firebase UID
+  email     String   @unique
+  createdAt DateTime @default(now())
+  role      Role     @default(USER)
+  profile Profile?
 
   @@map("users")
 }

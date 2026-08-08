@@ -1,0 +1,14 @@
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         Profile      @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  content        String
+  createdAt      DateTime     @default(now())
+
+  readBy MessageRead[]
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}

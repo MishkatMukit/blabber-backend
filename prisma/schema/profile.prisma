@@ -1,0 +1,21 @@
+model Profile {
+  id         String @id @default(cuid())
+  userId     String @unique
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userName   String @unique
+  bio        String @default("")
+  photo      String @default("")
+  blabsCount Int    @default(0) // denormalized; or drop and use _count
+
+  blabs  Blab[]
+  echoes Echo[]
+
+  blabApplause BlabApplause[]
+  echoApplause EchoApplause[]
+
+  conversations ConversationParticipant[]
+  messagesSent  Message[]                 @relation("MessageSender")
+  messageReads  MessageRead[]
+
+  @@map("profiles")
+}

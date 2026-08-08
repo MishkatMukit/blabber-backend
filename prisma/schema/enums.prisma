@@ -1,8 +1,8 @@
 enum Role {
-  CUSTOMER
+  USER
+  MODERATOR
   ADMIN
 }
-
 enum ActiveStatus {
   ACTIVE
   SUSPENDED

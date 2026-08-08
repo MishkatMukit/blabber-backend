@@ -1,0 +1,15 @@
+model Echo {
+  id        String   @id @default(cuid())
+  blabId    String
+  blab      Blab     @relation(fields: [blabId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    Profile  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+
+  applause EchoApplause[]
+
+  @@index([blabId])
+  @@index([authorId])
+  @@map("echoes")
+}

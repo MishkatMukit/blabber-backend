@@ -1,0 +1,13 @@
+model Blab {
+  id        String   @id @default(cuid())
+  authorId  String
+  author    Profile  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+
+  echoes   Echo[]
+  applause BlabApplause[]
+
+  @@index([authorId])
+  @@map("blabs")
+}

@@ -1,0 +1,12 @@
+model MessageRead {
+  userId    String
+  messageId String
+  readAt    DateTime @default(now())
+
+  user    Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@id([userId, messageId])
+  @@map("message_reads")
+}
+

@@ -1,0 +1,11 @@
+model EchoApplause {
+  userId    String
+  echoId    String
+  createdAt DateTime @default(now())
+
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  echo Echo    @relation(fields: [echoId], references: [id], onDelete: Cascade)
+
+  @@id([userId, echoId])
+  @@map("echo_applause")
+}
