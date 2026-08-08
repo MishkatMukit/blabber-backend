@@ -6,6 +6,7 @@ import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import { routeHandler } from "./middleware/routerHandler";
 import { blabRoutes } from "./modules/blab/blab.route";
 import { authRoutes } from "./modules/auth/auth.routes";
+import { echoRoutes } from "./modules/echo/echo.route";
 
 const app: Application = express();
 
@@ -29,6 +30,7 @@ app.get("/", async (req: Request, res: Response) => {
 
 app.use("/api/blabs", blabRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/echoes", echoRoutes);
 
 app.use(globalErrorHandler);
 app.use(routeHandler);

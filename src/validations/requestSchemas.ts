@@ -30,3 +30,13 @@ export const createBlabSchema = z.object({
 export const updateBlabSchema = z.object({
   content: z.string().trim().min(1, "Content cannot be empty").max(500, "Content cannot exceed 500 characters"),
 });
+
+// Echo schemas
+export const createEchoSchema = z.object({
+  blabId: z.string().min(1, "Blab id is required"),
+  content: z.string().trim().min(1, "Content cannot be empty").max(500, "Content cannot exceed 500 characters"),
+});
+
+export const updateEchoSchema = z.object({
+  content: z.string().trim().min(1, "Content cannot be empty").max(500, "Content cannot exceed 500 characters"),
+});
