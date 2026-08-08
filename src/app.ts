@@ -30,7 +30,7 @@ app.get("/", async (req: Request, res: Response) => {
 
 app.use("/api/blabs", blabRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/echoes", echoRoutes);
+app.use("/api/echo", echoRoutes);
 
 app.use(globalErrorHandler);
 app.use(routeHandler);
