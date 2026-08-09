@@ -18,7 +18,8 @@ export const globalErrorHandler = (
   } else if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === "P2002") {
       statusCode = httpStatus.BAD_REQUEST;
-      errorMessage = "Duplicate Key Error";
+      const target = (err.meta?.target as string[] | undefined)?.join(", ");
+      errorMessage = target ? `Duplicate Key Error: ${target} already exists` : "Duplicate Key Error";
     } else if (err.code === "P2003") {
       statusCode = httpStatus.BAD_REQUEST;
       errorMessage = "Foreign key constraint failed";

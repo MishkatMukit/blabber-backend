@@ -57,9 +57,10 @@ const logout = catchAsync(async (req, res) => {
 });
 
 const updateProfile = catchAsync(async (req, res) => {
-  const { bio, profilePhoto } = req.body;
+  const { userName, bio, profilePhoto } = req.body;
 
   const result = await authServices.updateProfileInDB(req.user!.id, {
+    userName,
     bio,
     profilePhoto,
   });
@@ -83,6 +84,23 @@ const getProfile = catchAsync(async (req, res) => {
   });
 });
 
+const checkUsername = catchAsync(async (req, res) => {
+  const userName = (req.query.userName as string)?.trim();
+
+  if (!userName) {
+    throw new Error("Username is required");
+  }
+
+  const result = await authServices.checkUsernameAvailability(userName);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Username availability checked successfully",
+    data: result,
+  });
+});
+
 export const authController = {
   register,
   login,
@@ -90,4 +108,5 @@ export const authController = {
   logout,
   getProfile,
   updateProfile,
+  checkUsername,
 };

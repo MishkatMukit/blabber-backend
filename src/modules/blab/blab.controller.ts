@@ -7,12 +7,14 @@ const getAll = catchAsync(async (req, res) => {
   const page = Math.max(parseInt(req.query.page as string) || 1, 1);
   const limit = Math.max(parseInt(req.query.limit as string) || 5, 1);
   const authorId = (req.query.authorId as string) || undefined;
+  const search = (req.query.search as string)?.trim() || undefined;
 
   const result = await blabServices.getAllFromDB({
     page,
     limit,
     authorId,
     profileId: req.user?.profileId,
+    search,
   });
 
   sendResponse(res, {

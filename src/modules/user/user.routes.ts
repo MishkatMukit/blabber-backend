@@ -4,6 +4,7 @@ import { userController } from "./user.controller";
 
 const router = Router();
 
+router.get("/search", auth(), userController.search);
 router.get("/:id/blabs", auth(), userController.getBlabs);
 router.get("/:id", auth(), userController.getProfile);
 

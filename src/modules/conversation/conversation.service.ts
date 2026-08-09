@@ -226,8 +226,34 @@ const getMessagesFromDB = async (conversationId: string, profileId: string) => {
   return messages;
 };
 
+const deleteConversationFromDB = async (conversationId: string, profileId: string) => {
+  const conversation = await prisma.conversation.findUnique({
+    where: { id: conversationId },
+    select: {
+      id: true,
+      participants: { select: { userId: true } },
+    },
+  });
+
+  if (!conversation) {
+    throw new Error("Conversation not found.");
+  }
+
+  if (!conversation.participants.some((p) => p.userId === profileId)) {
+    throw new Error("You are not a participant of this conversation.");
+  }
+
+  await prisma.conversation.delete({ where: { id: conversationId } });
+
+  return {
+    id: conversationId,
+    participantIds: conversation.participants.map((p) => p.userId),
+  };
+};
+
 export const conversationServices = {
   getConversationsFromDB,
   getOrCreateConversationFromDB,
   getMessagesFromDB,
+  deleteConversationFromDB,
 };

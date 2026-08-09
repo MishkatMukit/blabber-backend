@@ -16,6 +16,15 @@ type LoginPayload = {
 };
 
 const registerInDB = async (payload: RegisterPayload) => {
+  const existingProfile = await prisma.profile.findUnique({
+    where: { userName: payload.name },
+    select: { id: true },
+  });
+
+  if (existingProfile) {
+    throw new Error("Username is already taken");
+  }
+
   const hashedPassword = await bcrypt.hash(payload.password, Number(config.bcrypt_salt_rounds));
 
   const user = await prisma.$transaction(async (tx) => {
@@ -57,7 +66,7 @@ const registerInDB = async (payload: RegisterPayload) => {
         id: user.profile.id,
         userName: user.profile.userName,
         photo: user.profile.photo,
-        createdAt: createdUser.createdAt,
+        createdAt: user.createdAt,
       },
     },
     accessToken,
@@ -111,14 +120,27 @@ const loginInDB = async (payload: LoginPayload) => {
 };
 
 type UpdateProfilePayload = {
+  userName?: string;
   bio?: string;
   profilePhoto?: string;
 };
 
 const updateProfileInDB = async (userId: string, payload: UpdateProfilePayload) => {
+  if (payload.userName !== undefined) {
+    const existingProfile = await prisma.profile.findFirst({
+      where: { userName: payload.userName, userId: { not: userId } },
+      select: { id: true },
+    });
+
+    if (existingProfile) {
+      throw new Error("Username is already taken");
+    }
+  }
+
   const profile = await prisma.profile.update({
     where: { userId },
     data: {
+      ...(payload.userName !== undefined ? { userName: payload.userName } : {}),
       ...(payload.bio !== undefined ? { bio: payload.bio } : {}),
       ...(payload.profilePhoto !== undefined ? { photo: payload.profilePhoto } : {}),
     },
@@ -194,6 +216,15 @@ const getProfileFromDB = async (userId: string) => {
   };
 };
 
+const checkUsernameAvailability = async (userName: string) => {
+  const existingProfile = await prisma.profile.findUnique({
+    where: { userName },
+    select: { id: true },
+  });
+
+  return { available: !existingProfile };
+};
+
 export const authServices = {
   registerInDB,
   loginInDB,
@@ -201,4 +232,5 @@ export const authServices = {
   logoutInDB,
   getProfileFromDB,
   updateProfileInDB,
+  checkUsernameAvailability,
 };

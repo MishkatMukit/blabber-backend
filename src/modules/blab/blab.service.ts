@@ -5,11 +5,25 @@ type GetAllParams = {
   limit: number;
   authorId?: string;
   profileId?: string;
+  search?: string;
 };
 
-const getAllFromDB = async ({ page, limit, authorId, profileId }: GetAllParams) => {
+const getAllFromDB = async ({
+  page,
+  limit,
+  authorId,
+  profileId,
+  search,
+}: GetAllParams) => {
   const skip = (page - 1) * limit;
-  const where = authorId ? { authorId } : {};
+  const where: Record<string, unknown> = authorId ? { authorId } : {};
+
+  if (search) {
+    where.OR = [
+      { content: { contains: search, mode: "insensitive" } },
+      { author: { is: { userName: { contains: search, mode: "insensitive" } } } },
+    ];
+  }
 
   const [blabs, total] = await prisma.$transaction([
     prisma.blab.findMany({

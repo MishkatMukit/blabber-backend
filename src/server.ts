@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import app from "./app";
 import config from "./config";
 import { registerChatHandlers } from "./socket/chat";
+import { setSocketServer } from "./socket";
 
 const PORT = config.port;
 
@@ -17,6 +18,7 @@ const main = async () => {
     });
 
     registerChatHandlers(io);
+    setSocketServer(io);
 
     httpServer.listen(PORT, () => {
       console.log(`server is listening on port ${PORT}`);

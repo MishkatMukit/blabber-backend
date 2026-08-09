@@ -9,5 +9,6 @@ const router = Router();
 router.get("/", auth(), conversationController.getAll);
 router.post("/", auth(), validateRequest(createConversationSchema), conversationController.create);
 router.get("/:id/messages", auth(), conversationController.getMessages);
+router.delete("/:id", auth(), conversationController.remove);
 
 export const conversationRoutes = router;

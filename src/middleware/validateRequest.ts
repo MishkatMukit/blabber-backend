@@ -5,10 +5,11 @@ const validateRequest = (schema: ZodType<any>) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.body ?? {});
     if (!result.success) {
-      return res.status(500).json({
+      const message = result.error.issues[0]?.message || "Validation failed";
+      return res.status(400).json({
         success: false,
-        statusCode: 500,
-        message: "Validation failed",
+        statusCode: 400,
+        message,
         errorDetails: result.error.issues,
       });
     }

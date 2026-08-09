@@ -1,5 +1,21 @@
 import { prisma } from "../../lib/prisma";
 
+const searchProfilesFromDB = async (query: string, excludeProfileId: string) => {
+  return prisma.profile.findMany({
+    where: {
+      userName: { contains: query, mode: "insensitive" },
+      id: { not: excludeProfileId },
+    },
+    orderBy: { userName: "asc" },
+    take: 20,
+    select: {
+      id: true,
+      userName: true,
+      photo: true,
+    },
+  });
+};
+
 const getProfileFromDB = async (profileId: string) => {
   const profile = await prisma.profile.findUniqueOrThrow({
     where: { id: profileId },
@@ -47,6 +63,7 @@ const getBlabsFromDB = async (profileId: string) => {
 };
 
 export const userServices = {
+  searchProfilesFromDB,
   getProfileFromDB,
   getBlabsFromDB,
 };
