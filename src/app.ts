@@ -14,7 +14,12 @@ const app: Application = express();
 
 app.use(
   cors({
-    origin: config.app_url,
+    origin: (origin, callback) => {
+      if (!origin || config.cors_origins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
     credentials: true,
   })
 );

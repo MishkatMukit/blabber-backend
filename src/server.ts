@@ -12,7 +12,7 @@ const main = async () => {
     const httpServer = createServer(app);
     const io = new Server(httpServer, {
       cors: {
-        origin: config.app_url,
+        origin: config.cors_origins,
         credentials: true,
       },
     });
