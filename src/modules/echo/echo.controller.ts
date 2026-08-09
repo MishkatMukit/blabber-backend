@@ -4,7 +4,10 @@ import httpStatus from "http-status";
 import { echoServices } from "./echo.service";
 
 const getAllByBlab = catchAsync(async (req, res) => {
-  const result = await echoServices.getAllByBlabFromDB(req.params.blabId as string);
+  const result = await echoServices.getAllByBlabFromDB(
+    req.params.blabId as string,
+    req.user?.profileId
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -15,7 +18,10 @@ const getAllByBlab = catchAsync(async (req, res) => {
 });
 
 const getById = catchAsync(async (req, res) => {
-  const result = await echoServices.getByIdFromDB(req.params.id as string);
+  const result = await echoServices.getByIdFromDB(
+    req.params.id as string,
+    req.user?.profileId
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

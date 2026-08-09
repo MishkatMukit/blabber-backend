@@ -57,6 +57,7 @@ const registerInDB = async (payload: RegisterPayload) => {
         id: user.profile.id,
         userName: user.profile.userName,
         photo: user.profile.photo,
+        createdAt: createdUser.createdAt,
       },
     },
     accessToken,
@@ -100,6 +101,7 @@ const loginInDB = async (payload: LoginPayload) => {
             id: user.profile.id,
             userName: user.profile.userName,
             photo: user.profile.photo,
+            createdAt: user.createdAt,
           }
         : null,
     },
@@ -186,6 +188,7 @@ const getProfileFromDB = async (userId: string) => {
           bio: user.profile.bio,
           photo: user.profile.photo,
           blabsCount: user.profile.blabsCount,
+          createdAt: user.createdAt,
         }
       : null,
   };

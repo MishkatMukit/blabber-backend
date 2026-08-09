@@ -3,13 +3,17 @@ import { prisma } from "../../lib/prisma";
 type GetAllParams = {
   page: number;
   limit: number;
+  authorId?: string;
+  profileId?: string;
 };
 
-const getAllFromDB = async ({ page, limit }: GetAllParams) => {
+const getAllFromDB = async ({ page, limit, authorId, profileId }: GetAllParams) => {
   const skip = (page - 1) * limit;
+  const where = authorId ? { authorId } : {};
 
   const [blabs, total] = await prisma.$transaction([
     prisma.blab.findMany({
+      where,
       orderBy: { createdAt: "desc" },
       skip,
       take: limit,
@@ -29,11 +33,13 @@ const getAllFromDB = async ({ page, limit }: GetAllParams) => {
         },
       },
     }),
-    prisma.blab.count(),
+    prisma.blab.count({ where }),
   ]);
 
+  const applaudedIds = await getApplaudedIds(profileId, blabs.map((blab) => blab.id));
+
   return {
-    data: blabs,
+    data: blabs.map((blab) => ({ ...blab, applauded: applaudedIds.has(blab.id) })),
     meta: {
       page,
       limit,
@@ -43,8 +49,22 @@ const getAllFromDB = async ({ page, limit }: GetAllParams) => {
   };
 };
 
-const getByIdFromDB = async (id: string) => {
-  return await prisma.blab.findUniqueOrThrow({
+const getApplaudedIds = async (profileId: string | undefined, blabIds: string[]) => {
+  if (!profileId || blabIds.length === 0) return new Set<string>();
+
+  const rows = await prisma.blabApplause.findMany({
+    where: {
+      userId: profileId,
+      blabId: { in: blabIds },
+    },
+    select: { blabId: true },
+  });
+
+  return new Set(rows.map((row) => row.blabId));
+};
+
+const getByIdFromDB = async (id: string, profileId?: string) => {
+  const blab = await prisma.blab.findUniqueOrThrow({
     where: { id },
     include: {
       author: {
@@ -74,6 +94,10 @@ const getByIdFromDB = async (id: string) => {
       },
     },
   });
+
+  const applaudedIds = await getApplaudedIds(profileId, [blab.id]);
+
+  return { ...blab, applauded: applaudedIds.has(blab.id) };
 };
 
 const createInDB = async (userId: string, content: string) => {

@@ -7,6 +7,8 @@ import { routeHandler } from "./middleware/routerHandler";
 import { blabRoutes } from "./modules/blab/blab.route";
 import { authRoutes } from "./modules/auth/auth.routes";
 import { echoRoutes } from "./modules/echo/echo.route";
+import { userRoutes } from "./modules/user/user.routes";
+import { conversationRoutes } from "./modules/conversation/conversation.route";
 
 const app: Application = express();
 
@@ -31,6 +33,8 @@ app.get("/", async (req: Request, res: Response) => {
 app.use("/api/blabs", blabRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/echo", echoRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/conversations", conversationRoutes);
 
 app.use(globalErrorHandler);
 app.use(routeHandler);

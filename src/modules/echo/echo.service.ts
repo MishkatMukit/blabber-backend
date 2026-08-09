@@ -1,7 +1,21 @@
 import { prisma } from "../../lib/prisma";
 
-const getAllByBlabFromDB = async (blabId: string) => {
-  return await prisma.echo.findMany({
+const getApplaudedIds = async (profileId: string | undefined, echoIds: string[]) => {
+  if (!profileId || echoIds.length === 0) return new Set<string>();
+
+  const rows = await prisma.echoApplause.findMany({
+    where: {
+      userId: profileId,
+      echoId: { in: echoIds },
+    },
+    select: { echoId: true },
+  });
+
+  return new Set(rows.map((row) => row.echoId));
+};
+
+const getAllByBlabFromDB = async (blabId: string, profileId?: string) => {
+  const echoes = await prisma.echo.findMany({
     where: { blabId },
     orderBy: { createdAt: "desc" },
     include: {
@@ -19,10 +33,14 @@ const getAllByBlabFromDB = async (blabId: string) => {
       },
     },
   });
+
+  const applaudedIds = await getApplaudedIds(profileId, echoes.map((echo) => echo.id));
+
+  return echoes.map((echo) => ({ ...echo, applauded: applaudedIds.has(echo.id) }));
 };
 
-const getByIdFromDB = async (id: string) => {
-  return await prisma.echo.findUniqueOrThrow({
+const getByIdFromDB = async (id: string, profileId?: string) => {
+  const echo = await prisma.echo.findUniqueOrThrow({
     where: { id },
     include: {
       author: {
@@ -39,6 +57,10 @@ const getByIdFromDB = async (id: string) => {
       },
     },
   });
+
+  const applaudedIds = await getApplaudedIds(profileId, [echo.id]);
+
+  return { ...echo, applauded: applaudedIds.has(echo.id) };
 };
 
 const createInDB = async (userId: string, blabId: string, content: string) => {
@@ -46,35 +68,26 @@ const createInDB = async (userId: string, blabId: string, content: string) => {
     where: { userId },
   });
 
-  return await prisma.$transaction(async (tx) => {
-    const echo = await tx.echo.create({
-      data: {
-        blabId,
-        authorId: profile.id,
-        content,
-      },
-      include: {
-        author: {
-          select: {
-            id: true,
-            userName: true,
-            photo: true,
-          },
-        },
-        _count: {
-          select: {
-            applause: true,
-          },
+  return await prisma.echo.create({
+    data: {
+      blabId,
+      authorId: profile.id,
+      content,
+    },
+    include: {
+      author: {
+        select: {
+          id: true,
+          userName: true,
+          photo: true,
         },
       },
-    });
-
-    await tx.blab.update({
-      where: { id: blabId },
-      data: { echoesCount: { increment: 1 } },
-    });
-
-    return echo;
+      _count: {
+        select: {
+          applause: true,
+        },
+      },
+    },
   });
 };
 
@@ -120,14 +133,7 @@ const deleteFromDB = async (id: string, userId: string) => {
     throw new Error("You can only delete your own echoes.");
   }
 
-  return await prisma.$transaction(async (tx) => {
-    await tx.echo.delete({ where: { id } });
-
-    await tx.blab.update({
-      where: { id: echo.blabId },
-      data: { echoesCount: { decrement: 1 } },
-    });
-  });
+  return await prisma.echo.delete({ where: { id } });
 };
 
 const applaudEchoInDB = async (id: string, userId: string) => {

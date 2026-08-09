@@ -6,8 +6,14 @@ import { blabServices } from "./blab.service";
 const getAll = catchAsync(async (req, res) => {
   const page = Math.max(parseInt(req.query.page as string) || 1, 1);
   const limit = Math.max(parseInt(req.query.limit as string) || 5, 1);
+  const authorId = (req.query.authorId as string) || undefined;
 
-  const result = await blabServices.getAllFromDB({ page, limit });
+  const result = await blabServices.getAllFromDB({
+    page,
+    limit,
+    authorId,
+    profileId: req.user?.profileId,
+  });
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -19,7 +25,10 @@ const getAll = catchAsync(async (req, res) => {
 });
 
 const getById = catchAsync(async (req, res) => {
-  const result = await blabServices.getByIdFromDB(req.params.id as string);
+  const result = await blabServices.getByIdFromDB(
+    req.params.id as string,
+    req.user?.profileId
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

@@ -1,11 +1,24 @@
+import { createServer } from "http";
+import { Server } from "socket.io";
 import app from "./app";
 import config from "./config";
+import { registerChatHandlers } from "./socket/chat";
 
 const PORT = config.port;
 
 const main = async () => {
   try {
-    app.listen(PORT, () => {
+    const httpServer = createServer(app);
+    const io = new Server(httpServer, {
+      cors: {
+        origin: config.app_url,
+        credentials: true,
+      },
+    });
+
+    registerChatHandlers(io);
+
+    httpServer.listen(PORT, () => {
       console.log(`server is listening on port ${PORT}`);
     });
   } catch (error) {

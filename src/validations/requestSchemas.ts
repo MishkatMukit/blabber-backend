@@ -45,3 +45,8 @@ export const createEchoSchema = z.object({
 export const updateEchoSchema = z.object({
   content: z.string().trim().min(1, "Content cannot be empty").max(500, "Content cannot exceed 500 characters"),
 });
+
+// Conversation schemas
+export const createConversationSchema = z.object({
+  recipientId: z.string().min(1, "Recipient id is required"),
+});
