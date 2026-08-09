@@ -108,6 +108,29 @@ const loginInDB = async (payload: LoginPayload) => {
   };
 };
 
+type UpdateProfilePayload = {
+  bio?: string;
+  profilePhoto?: string;
+};
+
+const updateProfileInDB = async (userId: string, payload: UpdateProfilePayload) => {
+  const profile = await prisma.profile.update({
+    where: { userId },
+    data: {
+      ...(payload.bio !== undefined ? { bio: payload.bio } : {}),
+      ...(payload.profilePhoto !== undefined ? { photo: payload.profilePhoto } : {}),
+    },
+  });
+
+  return {
+    id: profile.id,
+    userName: profile.userName,
+    bio: profile.bio,
+    photo: profile.photo,
+    blabsCount: profile.blabsCount,
+  };
+};
+
 const refreshTokenInDB = async (refreshToken: string) => {
   const verifiedToken = jwtUtils.verifyToken(refreshToken, config.jwt_refresh_secret);
   if (!verifiedToken.success) {
@@ -138,7 +161,7 @@ const refreshTokenInDB = async (refreshToken: string) => {
   };
 };
 
-const logoutInDB = async () => {
+const logoutInDB = async (_token?: string) => {
   // Tokens are stateless JWTs; logout is handled client-side by discarding tokens.
   return { success: true };
 };
@@ -174,4 +197,5 @@ export const authServices = {
   refreshTokenInDB,
   logoutInDB,
   getProfileFromDB,
+  updateProfileInDB,
 };

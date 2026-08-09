@@ -31,7 +31,8 @@ const login = catchAsync(async (req, res) => {
 });
 
 const refreshToken = catchAsync(async (req, res) => {
-  const result = await authServices.refreshTokenInDB(req.body.refreshToken);
+  const token = req.body.refreshToken || req.cookies?.refreshToken;
+  const result = await authServices.refreshTokenInDB(token);
 
   setAuthCookies(res, result.accessToken, result.refreshToken);
 
@@ -44,7 +45,7 @@ const refreshToken = catchAsync(async (req, res) => {
 });
 
 const logout = catchAsync(async (req, res) => {
-  await authServices.logoutInDB();
+  await authServices.logoutInDB(req.body.refreshToken || req.cookies?.refreshToken);
 
   clearAuthCookies(res);
 
@@ -52,6 +53,22 @@ const logout = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "User logged out successfully",
+  });
+});
+
+const updateProfile = catchAsync(async (req, res) => {
+  const { bio, profilePhoto } = req.body;
+
+  const result = await authServices.updateProfileInDB(req.user!.id, {
+    bio,
+    profilePhoto,
+  });
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Profile updated successfully",
+    data: result,
   });
 });
 
@@ -72,4 +89,5 @@ export const authController = {
   refreshToken,
   logout,
   getProfile,
+  updateProfile,
 };

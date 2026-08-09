@@ -15,11 +15,16 @@ export const loginSchema = z.object({
 });
 
 export const refreshTokenSchema = z.object({
-  refreshToken: z.string().min(1, "Refresh token is required"),
+  refreshToken: z.string().min(1, "Refresh token is required").optional(),
 });
 
 export const logoutSchema = z.object({
-  refreshToken: z.string().min(1, "Refresh token is required"),
+  refreshToken: z.string().min(1, "Refresh token is required").optional(),
+});
+
+export const updateProfileSchema = z.object({
+  bio: z.string().trim().optional(),
+  profilePhoto: z.string().trim().optional(),
 });
 
 // Blab schemas

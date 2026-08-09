@@ -6,6 +6,7 @@ import {
   loginSchema,
   refreshTokenSchema,
   logoutSchema,
+  updateProfileSchema,
 } from "../../validations/requestSchemas";
 import { authController } from "./auth.controller";
 
@@ -15,6 +16,7 @@ router.post("/register", validateRequest(registerSchema), authController.registe
 router.post("/login", validateRequest(loginSchema), authController.login);
 router.post("/refresh-token", validateRequest(refreshTokenSchema), authController.refreshToken);
 router.post("/logout", validateRequest(logoutSchema), authController.logout);
+router.patch("/profile", auth(), validateRequest(updateProfileSchema), authController.updateProfile);
 router.get("/profile", auth(), authController.getProfile);
 
 export const authRoutes = router;
