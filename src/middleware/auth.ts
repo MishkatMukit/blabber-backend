@@ -59,13 +59,13 @@ const setAuthCookies = (res: Response, accessToken: string, refreshToken: string
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: isProduction,
+    sameSite: "none",
+    secure: true,
   });
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: isProduction,
+    sameSite: "none",
+    secure: true,
   });
 };
 
