@@ -61,11 +61,13 @@ const setAuthCookies = (res: Response, accessToken: string, refreshToken: string
     httpOnly: true,
     sameSite: "none",
     secure: true,
+    maxAge : 1 * 24 * 60 * 60 * 1000
   });
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     sameSite: "none",
     secure: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000
   });
 };
 
